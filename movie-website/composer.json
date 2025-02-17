@@ -1,0 +1,24 @@
+{
+    "name": "movie-website",
+    "description": "A PHP MVC application for managing a movie website.",
+    "type": "project",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "slim/slim": "^4.0",
+        "illuminate/database": "^8.0",
+        "twig/twig": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
