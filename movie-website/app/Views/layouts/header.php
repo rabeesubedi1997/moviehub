@@ -127,6 +127,96 @@
         .menu-item:hover .dropdown-icon {
             transform: rotate(180deg);
         }
+
+        .slider {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slider-item {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .slider-item.active {
+            opacity: 1;
+        }
+
+        .slider-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+        }
+
+        .slider-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1rem;
+        }
+
+        .slider-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .slider-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .slider-indicators {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+        }
     </style>
 </head>
 
@@ -135,7 +225,7 @@
         <!-- Top Navigation -->
         <nav class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
-                <a href="/MovieHub/movie-website/public/index.php" class="text-2xl font-bold text-blue-500">Movie<span class="text-white">Hub</span></a>
+                <a href="/MovieHub/movie-website/public/index.php" target="_blank" class="text-2xl font-bold text-blue-500">Movie<span class="text-white">Hub</span></a>
                 <div class="flex items-center space-x-8">
                     <a href="/MovieHub/movie-website/public/index.php" class="nav-link">Home</a>
                     <div class="menu-item">
@@ -233,9 +323,16 @@
                     </div>
                     <a href="#news" class="nav-link">News</a>
                     <a href="#contact" class="nav-link">Contact</a>
-                    <a href="/MovieHub/movie-website/app/Views/users/login.php" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full">
-                        <i class="fas fa-user-shield mr-2"></i>Admin
-                    </a>
+                    <!-- Replace the admin link -->
+                    <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin'): ?>
+                        <a href="/MovieHub/movie-website/app/Views/admin/dashboard.php" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full">
+                            <i class="fas fa-user-shield mr-2"></i>Admin Dashboard
+                        </a>
+                    <?php else: ?>
+                        <a href="/MovieHub/movie-website/app/Views/users/login.php" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full">
+                            <i class="fas fa-user-shield mr-2"></i>Admin Login
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </nav>

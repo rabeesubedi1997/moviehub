@@ -53,12 +53,18 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - MovieHub</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Heroicons -->
-    <link href="https://unpkg.com/heroicons@1.0.1/outline/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<!-- Add this right after the header section -->
+<!-- Add this after the header section -->
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 mx-8" role="alert">
+        <span class="block sm:inline"><?php echo $_SESSION['success']; ?></span>
+    </div>
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
 <?php if (isset($_SESSION['error'])): ?>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 mx-8" role="alert">
         <span class="block sm:inline"><?php echo $_SESSION['error']; ?></span>
     </div>
     <?php unset($_SESSION['error']); ?>
@@ -76,12 +82,6 @@ try {
                 <a href="dashboard.php" class="block py-2.5 px-4 rounded transition duration-200 bg-blue-700 hover:bg-blue-600">
                     Dashboard
                 </a>
-                <a href="add_movie.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
-                    Add Movie
-                </a>
-                <a href="edit_movie.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
-                    Edit Movie
-                </a>
                 <a href="/movies/index.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
                     View Movies
                 </a>
@@ -98,17 +98,17 @@ try {
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                     <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
                     <div class="flex items-center space-x-4">
+                        <button onclick="window.location.href='add_movie.php'"
+                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            <i class="fas fa-plus mr-2"></i>Add Movie
+                        </button>
                         <a href="/MovieHub/movie-website/public/index.php"
-                            class="flex items-center text-blue-600 hover:text-blue-800"
-                            title="View Site">
-                            <i class="fas fa-external-link-alt mr-2"></i>
-                            View Site
+                            class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-external-link-alt mr-2"></i>View Site
                         </a>
-                        <span class="text-gray-500">Admin</span>
                         <a href="/MovieHub/movie-website/app/Views/users/logout.php"
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            <i class="fas fa-sign-out-alt mr-2"></i>
-                            Logout
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
                         </a>
                     </div>
                 </div>
@@ -194,11 +194,14 @@ try {
                                                 <?php echo htmlspecialchars($movie['release_date']); ?>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <a href="edit_movie.php?id=<?php echo $movie['id']; ?>"
-                                                    class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                                <a href="delete_movie.php?id=<?php echo $movie['id']; ?>"
-                                                    class="text-red-600 hover:text-red-900"
-                                                    onclick="return confirm('Are you sure you want to delete this movie?')">Delete</a>
+                                                <button onclick="window.location.href='edit_movie.php?id=<?php echo $movie['id']; ?>'"
+                                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
+                                                    <i class="fas fa-edit mr-1"></i>Edit
+                                                </button>
+                                                <button onclick="if(confirm('Are you sure you want to delete this movie?')) window.location.href='delete_movie.php?id=<?php echo $movie['id']; ?>'"
+                                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">
+                                                    <i class="fas fa-trash-alt mr-1"></i>Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
