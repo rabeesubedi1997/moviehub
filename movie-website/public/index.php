@@ -2,8 +2,10 @@
 session_start();
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../app/Controllers/MovieController.php';
+require_once __DIR__ . '/../app/Controllers/NewsController.php';
 
 $movieController = new MovieController($pdo);
+$newsController = new NewsController($pdo);
 
 // Simple router
 $action = $_GET['action'] ?? '';
@@ -16,6 +18,83 @@ if ($action === 'store' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
         header('Location: /MovieHub/movie-website/app/Views/admin/add_movie.php');
+    }
+    exit();
+}
+
+if ($action === 'store_news' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $file = isset($_FILES['image']) ? $_FILES['image'] : null;
+        $newsController->store($_POST, $file);
+        $_SESSION['success'] = "News article added successfully!";
+        header('Location: /MovieHub/movie-website/app/Views/admin/dashboard.php');
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+        header('Location: /MovieHub/movie-website/app/Views/admin/add_news.php');
+    }
+    exit();
+}
+
+if ($action === 'update_news' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $newsController->update($_GET['id'], $_POST, $_FILES['image'] ?? null);
+        $_SESSION['success'] = "News article updated successfully!";
+        header('Location: /MovieHub/movie-website/app/Views/admin/manage_news.php');
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+        header('Location: /MovieHub/movie-website/app/Views/admin/edit_news.php?id=' . $_GET['id']);
+    }
+    exit();
+}
+
+if ($action === 'delete_news' && $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    try {
+        $newsController->delete($_GET['id']);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
+    exit();
+}
+
+// Add these routes to your existing router
+if ($action === 'news_list') {
+    try {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 9;
+        $offset = ($page - 1) * $limit;
+
+        $newsStmt = $pdo->prepare("
+            SELECT * FROM news 
+            WHERE status = 'public' 
+            ORDER BY created_at DESC 
+            LIMIT ? OFFSET ?
+        ");
+        $newsStmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $newsStmt->bindValue(2, $offset, PDO::PARAM_INT);
+        $newsStmt->execute();
+
+        $news = $newsStmt->fetchAll(PDO::FETCH_ASSOC);
+        require_once __DIR__ . '/../app/Views/news/index.php';
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+        header('Location: /MovieHub/movie-website/public/index.php');
+    }
+    exit();
+}
+
+if ($action === 'news_detail') {
+    try {
+        $newsId = $_GET['id'] ?? null;
+        if (!$newsId) {
+            throw new Exception('News ID not provided');
+        }
+
+        require_once __DIR__ . '/../app/Views/news/detail.php';
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+        header('Location: /MovieHub/movie-website/public/index.php?action=news_list');
     }
     exit();
 }
@@ -36,24 +115,21 @@ try {
 require_once __DIR__ . '/../app/Views/layouts/header.php';
 ?>
 
-<!-- Hero Section with Video Background -->
-<div class="relative h-screen overflow-hidden">
+<!-- Hero Section -->
+<div class="relative min-h-[500px] md:h-screen overflow-hidden">
     <div class="absolute inset-0">
-        <iframe
-            class="w-full h-full"
+        <iframe class="w-full h-full"
             src="https://www.youtube.com/embed/tGpTpVyI_OQ?autoplay=1&mute=1&loop=1&playlist=tGpTpVyI_OQ&controls=0&showinfo=0&rel=0&modestbranding=1"
-            title="Background Video"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
+            title="Background Video" frameborder="0" allowfullscreen>
         </iframe>
     </div>
     <div class="absolute inset-0 bg-black bg-opacity-60"></div>
     <div class="relative container mx-auto px-4 h-full flex items-center">
-        <div class="text-white max-w-3xl">
-            <h1 class="text-6xl font-bold mb-6">Welcome to MovieHub</h1>
-            <p class="text-2xl mb-8">Discover the magic of cinema</p>
-            <a href="https://www.youtube.com/watch?v=tGpTpVyI_OQ" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full inline-flex items-center">
+        <div class="text-white max-w-3xl mx-auto text-center md:text-left">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 md:mb-6">Welcome to MovieHub</h1>
+            <p class="text-xl md:text-2xl mb-6 md:mb-8">Discover the magic of cinema</p>
+            <a href="#movies"
+                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 md:py-3 md:px-8 rounded-full">
                 <i class="fas fa-play mr-2"></i>
                 Explore Movies
             </a>
@@ -62,105 +138,36 @@ require_once __DIR__ . '/../app/Views/layouts/header.php';
 </div>
 
 <!-- Featured Movies Section -->
-<section class="py-16 bg-gray-900">
+<section class="py-8 md:py-16 bg-gray-900">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-white mb-8">Featured Movies</h2>
-        <div class="featured-slider relative overflow-hidden">
-            <div class="featured-slider-track flex transition-transform duration-500">
-                <?php foreach ($featuredMovies as $movie): ?>
-                    <div class="featured-slide w-1/3 px-4 flex-shrink-0">
-                        <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105">
-                            <img src="/MovieHub/movie-website/public/assets/images/movies/<?php echo htmlspecialchars($movie['image']); ?>"
-                                alt="<?php echo htmlspecialchars($movie['title']); ?>"
-                                class="w-full h-64 object-cover">
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold text-white mb-2"><?php echo htmlspecialchars($movie['title']); ?></h3>
-                                <p class="text-gray-400 mb-4"><?php echo htmlspecialchars($movie['genre']); ?></p>
-                                <a href="#" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700">
-                                    Watch Now
-                                </a>
-                            </div>
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">Featured Movies</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <?php foreach ($featuredMovies as $movie): ?>
+                <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform transition duration-300 hover:scale-105">
+                    <div class="relative pb-[56.25%]">
+                        <img src="/MovieHub/movie-website/public/assets/images/movies/<?php echo htmlspecialchars($movie['image']); ?>"
+                            alt="<?php echo htmlspecialchars($movie['title']); ?>"
+                            class="absolute top-0 left-0 w-full h-full object-cover">
+                    </div>
+                    <div class="p-4 md:p-6">
+                        <h3 class="text-lg md:text-xl font-bold text-white mb-2">
+                            <?php echo htmlspecialchars($movie['title']); ?>
+                        </h3>
+                        <p class="text-gray-400 mb-4">
+                            <?php echo htmlspecialchars($movie['genre']); ?>
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="movie_details.php?id=<?php echo $movie['id']; ?>"
+                                class="inline-block bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 text-sm md:text-base">
+                                Watch Now
+                            </a>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
-
-<style>
-    .featured-slider {
-        position: relative;
-        width: 100%;
-    }
-
-    .featured-slider-track {
-        display: flex;
-        transition: transform 0.5s ease;
-    }
-
-    .featured-slide {
-        width: 33.333%;
-    }
-
-    @media (max-width: 768px) {
-        .featured-slide {
-            width: 100%;
-        }
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const track = document.querySelector('.featured-slider-track');
-        const slides = document.querySelectorAll('.featured-slide');
-        const slideWidth = 100 / 3; // Show 3 slides at a time
-        let currentIndex = 0;
-
-        // Clone first few slides and append to end for smooth infinite scroll
-        const slidesToClone = 3;
-        for (let i = 0; i < slidesToClone; i++) {
-            const clone = slides[i].cloneNode(true);
-            track.appendChild(clone);
-        }
-
-        function moveSlides() {
-            currentIndex++;
-            track.style.transform = `translateX(-${currentIndex * slideWidth}%)`;
-            track.style.transition = 'transform 0.5s ease';
-
-            // Reset to beginning when reaching end
-            if (currentIndex >= slides.length) {
-                setTimeout(() => {
-                    currentIndex = 0;
-                    track.style.transition = 'none';
-                    track.style.transform = 'translateX(0)';
-                    setTimeout(() => {
-                        track.style.transition = 'transform 0.5s ease';
-                    }, 50);
-                }, 500);
-            }
-        }
-
-        // Auto scroll every 3 seconds
-        setInterval(moveSlides, 3000);
-
-        // Pause on hover
-        track.addEventListener('mouseenter', () => clearInterval(autoScroll));
-        track.addEventListener('mouseleave', () => autoScroll = setInterval(moveSlides, 3000));
-
-        // Handle window resize
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                currentIndex = 0;
-                track.style.transition = 'none';
-                track.style.transform = 'translateX(0)';
-            }, 250);
-        });
-    });
-</script>
 
 <!-- Movie Slider Section -->
 <section class="py-16 bg-gray-800">
@@ -270,3 +277,61 @@ require_once __DIR__ . '/../app/Views/layouts/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../app/Views/layouts/footer.php'; ?>
+
+<style>
+    @layer base {
+        html {
+            @apply antialiased;
+        }
+
+        body {
+            @apply text-base;
+        }
+    }
+
+    @layer components {
+        .container {
+            @apply px-4 mx-auto;
+            max-width: 1280px;
+        }
+
+        .btn {
+            @apply inline-flex items-center justify-center px-4 py-2 rounded-full transition-colors;
+        }
+
+        .btn-primary {
+            @apply bg-blue-600 text-white hover:bg-blue-700;
+        }
+    }
+
+    @layer utilities {
+        .aspect-video {
+            aspect-ratio: 16 / 9;
+        }
+    }
+
+    /* Mobile-first responsive breakpoints */
+    @media (min-width: 640px) {
+        .container {
+            max-width: 640px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            max-width: 768px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .container {
+            max-width: 1024px;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .container {
+            max-width: 1280px;
+        }
+    }
+</style>

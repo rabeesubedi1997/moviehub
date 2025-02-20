@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieHub - Welcome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MovieHub</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Add custom styles -->
@@ -217,17 +217,36 @@
         .indicator.active {
             background: white;
         }
+
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: none;
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+        }
     </style>
 </head>
 
-<body>
-    <header class="bg-gray-900 text-white border-b border-gray-800">
-        <!-- Top Navigation -->
-        <nav class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
+<body class="bg-gray-100">
+    <!-- Mobile Navigation Toggle -->
+    <div class="md:hidden">
+        <button id="mobile-menu-button" class="p-4 focus:outline-none">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-gray-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
                 <a href="/MovieHub/movie-website/public/index.php" target="_blank" class="text-2xl font-bold text-blue-500">Movie<span class="text-white">Hub</span></a>
-                <div class="flex items-center space-x-8">
-                    <a href="/MovieHub/movie-website/public/index.php" class="nav-link">Home</a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/MovieHub/movie-website/public/index.php" class="hover:text-blue-500">Home</a>
+                    <a href="/MovieHub/movie-website/public/movies.php" class="hover:text-blue-500">Movies</a>
+                    <a href="/MovieHub/movie-website/app/Views/news/index.php" class="hover:text-blue-500">News</a>
                     <div class="menu-item">
                         <a href="#movies" class="nav-link flex items-center gap-2">
                             Movies
@@ -335,8 +354,40 @@
                     <?php endif; ?>
                 </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu md:hidden bg-gray-900 text-white">
+        <div class="px-4 py-2 space-y-4">
+            <a href="/MovieHub/movie-website/public/index.php" class="block hover:text-blue-500">Home</a>
+            <a href="#movies" class="block hover:text-blue-500">Movies</a>
+            <a href="#about" class="block hover:text-blue-500">About</a>
+            <a href="#contact" class="block hover:text-blue-500">Contact</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <a href="/MovieHub/movie-website/app/Views/admin/dashboard.php"
+                        class="block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-center">Dashboard</a>
+                <?php endif; ?>
+                <a href="/MovieHub/movie-website/app/Views/users/logout.php"
+                    class="block text-red-500 hover:text-red-600">Logout</a>
+            <?php else: ?>
+                <a href="/MovieHub/movie-website/app/Views/users/login.php"
+                    class="block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-center">Login</a>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+            });
+        });
+    </script>
 </body>
 
 </html>

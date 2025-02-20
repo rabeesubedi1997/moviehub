@@ -82,8 +82,14 @@ try {
                 <a href="dashboard.php" class="block py-2.5 px-4 rounded transition duration-200 bg-blue-700 hover:bg-blue-600">
                     Dashboard
                 </a>
-                <a href="/movies/index.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
-                    View Movies
+                <a href="add_movie.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                    Add Movie
+                </a>
+                <a href="add_news.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                    Add News
+                </a>
+                <a href="manage_news.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                    Manage News
                 </a>
                 <a href="/MovieHub/movie-website/app/Views/users/logout.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
                     Logout
@@ -102,7 +108,7 @@ try {
                             class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             <i class="fas fa-plus mr-2"></i>Add Movie
                         </button>
-                        <a href="/MovieHub/movie-website/public/index.php"
+                        <a href="/MovieHub/movie-website/public/index.php" target="_blank"
                             class="text-blue-600 hover:text-blue-800">
                             <i class="fas fa-external-link-alt mr-2"></i>View Site
                         </a>

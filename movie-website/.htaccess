@@ -1,12 +1,17 @@
 RewriteEngine On
 RewriteBase /MovieHub/movie-website/public/
 
-# Remove .php extension from URLs
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([^\.]+)$ $1.php [NC,L]
+# Redirect news routes
+RewriteRule ^news/?$ index.php?action=news_list [L,QSA]
+RewriteRule ^news/([0-9]+)/?$ index.php?action=news_detail&id=$1 [L,QSA]
 
-# Route all requests through index.php
+# Handle other routes
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+Options -Indexes
+<FilesMatch "\.(jpg|jpeg|png|gif)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
