@@ -1,5 +1,5 @@
 <?php
-session_start();
+//session_start();
 require_once __DIR__ . '/../../../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -17,20 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['role'] = $user['role'];
 
             if ($user['role'] === 'admin') {
-                header('Location: /MovieHub/movie-website/app/Views/admin/dashboard.php');
+                header('Location: /MovieHub/movie-website/public/admin/dashboard');
             } else {
-                // For regular users, redirect to user dashboard
-                header('Location: /MovieHub/movie-website/app/Views/users/dashboard.php');
+                header('Location: /MovieHub/movie-website/public/');
             }
             exit();
         } else {
             $_SESSION['error'] = "Invalid username or password";
-            header('Location: /MovieHub/movie-website/app/Views/users/login.php');
+            header('Location: /MovieHub/movie-website/public/login');
             exit();
         }
     } catch (PDOException $e) {
         $_SESSION['error'] = "Login failed: " . $e->getMessage();
-        header('Location: /MovieHub/movie-website/app/Views/users/login.php');
+        header('Location: /MovieHub/movie-website/public/login');
         exit();
     }
 }
@@ -58,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-            <form action="/MovieHub/movie-website/public/login_process.php" method="POST">
+            <form action="/MovieHub/movie-website/public/login" method="POST">
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
                         Username

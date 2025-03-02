@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MovieHub</title>
+    <title>MovieHub Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <!-- Add custom styles -->
     <style>
         .mega-menu {
@@ -242,116 +244,47 @@
     <nav class="bg-gray-900 text-white">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-16">
-                <a href="/MovieHub/movie-website/public/index.php" target="_blank" class="text-2xl font-bold text-blue-500">Movie<span class="text-white">Hub</span></a>
+                <a href="/MovieHub/movie-website/public/index.php" class="text-2xl font-bold text-blue-500">Movie<span class="text-white">Hub</span></a>
+                
+                <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="/MovieHub/movie-website/public/index.php" class="hover:text-blue-500">Home</a>
-                    <a href="/MovieHub/movie-website/public/movies.php" class="hover:text-blue-500">Movies</a>
-                    <a href="/MovieHub/movie-website/app/Views/news/index.php" class="hover:text-blue-500">News</a>
-                    <div class="menu-item">
-                        <a href="#movies" class="nav-link flex items-center gap-2">
-                            Movies
-                            <i class="fas fa-chevron-down text-xs dropdown-icon"></i>
-                        </a>
-                        <div class="mega-menu">
-                            <div class="mega-menu-content">
-                                <div class="grid grid-cols-12 gap-8">
-                                    <div class="col-span-3">
-                                        <h3 class="menu-title">Latest Releases</h3>
-                                        <ul class="menu-list">
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fas fa-film text-blue-500"></i>
-                                                    New Releases
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fas fa-calendar text-blue-500"></i>
-                                                    Coming Soon
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fas fa-star text-blue-500"></i>
-                                                    Top Rated
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-span-3">
-                                        <h3 class="menu-title">Genres</h3>
-                                        <ul class="menu-list">
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fas fa-running text-blue-500"></i>
-                                                    Action
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fas fa-theater-masks text-blue-500"></i>
-                                                    Drama
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <i class="fas fa-laugh text-blue-500"></i>
-                                                    Comedy
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-span-6">
-                                        <h3 class="menu-title">Featured Movies</h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div class="featured-movie">
-                                                <img src="/MovieHub/movie-website/public/assets/images/movies/featured1.jpg"
-                                                    alt="Featured Movie">
-                                                <div class="featured-movie-overlay">
-                                                    <h4 class="text-white text-lg font-semibold">Movie Title</h4>
-                                                    <p class="text-gray-300 text-sm">Action, Drama</p>
-                                                </div>
-                                            </div>
-                                            <div class="featured-movie">
-                                                <img src="/MovieHub/movie-website/public/assets/images/movies/featured2.jpg"
-                                                    alt="Featured Movie">
-                                                <div class="featured-movie-overlay">
-                                                    <h4 class="text-white text-lg font-semibold">Movie Title</h4>
-                                                    <p class="text-gray-300 text-sm">Thriller, Mystery</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <a href="/MovieHub/movie-website/public/index.php" class="<?php echo $route === '/' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-900'; ?>">Home</a>
+                    <a href="/MovieHub/movie-website/public/movies" class="<?php echo $route === '/movies' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-900'; ?>">Movies</a>
+                    <a href="/MovieHub/movie-website/public/news" class="<?php echo $route === '/news' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-900'; ?>">News</a>
+                    <a href="/MovieHub/movie-website/public/about" class="hover:text-blue-500">About</a>
+                    <a href="/MovieHub/movie-website/public/contact" class="hover:text-blue-500">Contact</a>
+
+                    <!-- Authentication Links -->
+                    <div class="flex items-center space-x-4">
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <?php if ($_SESSION['role'] === 'admin'): ?>
+                                <a href="/MovieHub/movie-website/public/admin/dashboard"
+                                    class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full">
+                                    <i class="fas fa-user-shield mr-2"></i>Admin Dashboard
+                                </a>
+                            <?php endif; ?>
+                            <a href="/MovieHub/movie-website/public/logout"
+                                class="text-white hover:text-gray-300">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
+                        <?php else: ?>
+                            <a href="/MovieHub/movie-website/public/login"
+                                class="text-white hover:text-gray-300">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Login
+                            </a>
+                            <a href="/MovieHub/movie-website/public/register"
+                                class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full">
+                                <i class="fas fa-user-plus mr-2"></i>Register
+                            </a>
+                        <?php endif; ?>
                     </div>
-                    <div class="relative menu-item">
-                        <a href="#about" class="nav-link">About</a>
-                        <div class="mega-menu py-8">
-                            <div class="container mx-auto grid grid-cols-3 gap-8">
-                                <div>
-                                    <h3 class="menu-title">Company</h3>
-                                    <ul class="menu-list">
-                                        <li><a href="#" class="hover:text-blue-400">Our Story</a></li>
-                                        <li><a href="#" class="hover:text-blue-400">Team</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="#news" class="nav-link">News</a>
-                    <a href="#contact" class="nav-link">Contact</a>
-                    <!-- Replace the admin link -->
-                    <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin'): ?>
-                        <a href="/MovieHub/movie-website/app/Views/admin/dashboard.php" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full">
-                            <i class="fas fa-user-shield mr-2"></i>Admin Dashboard
-                        </a>
-                    <?php else: ?>
-                        <a href="/MovieHub/movie-website/app/Views/users/login.php" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full">
-                            <i class="fas fa-user-shield mr-2"></i>Admin Login
-                        </a>
-                    <?php endif; ?>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="p-4 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -361,19 +294,34 @@
     <div id="mobile-menu" class="mobile-menu md:hidden bg-gray-900 text-white">
         <div class="px-4 py-2 space-y-4">
             <a href="/MovieHub/movie-website/public/index.php" class="block hover:text-blue-500">Home</a>
-            <a href="#movies" class="block hover:text-blue-500">Movies</a>
-            <a href="#about" class="block hover:text-blue-500">About</a>
-            <a href="#contact" class="block hover:text-blue-500">Contact</a>
+            <a href="/MovieHub/movie-website/public/movies" class="block hover:text-blue-500">Movies</a>
+            <a href="/MovieHub/movie-website/public/news" class="block hover:text-blue-500">News</a>
+            <a href="/MovieHub/movie-website/public/about" class="block hover:text-blue-500">About</a>
+            <a href="/MovieHub/movie-website/public/contact" class="block hover:text-blue-500">Contact</a>
+
+            <!-- Mobile Authentication Links -->
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php if ($_SESSION['role'] === 'admin'): ?>
-                    <a href="/MovieHub/movie-website/app/Views/admin/dashboard.php"
-                        class="block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-center">Dashboard</a>
+                    <a href="/MovieHub/movie-website/public/admin/dashboard"
+                        class="block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-center mb-2">
+                        <i class="fas fa-user-shield mr-2"></i>Dashboard
+                    </a>
                 <?php endif; ?>
-                <a href="/MovieHub/movie-website/app/Views/users/logout.php"
-                    class="block text-red-500 hover:text-red-600">Logout</a>
+                <a href="/MovieHub/movie-website/public/logout"
+                    class="block text-red-500 hover:text-red-600">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </a>
             <?php else: ?>
-                <a href="/MovieHub/movie-website/app/Views/users/login.php"
-                    class="block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-center">Login</a>
+                <div class="space-y-2">
+                    <a href="/MovieHub/movie-website/public/login"
+                        class="block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </a>
+                    <a href="/MovieHub/movie-website/public/register"
+                        class="block bg-green-600 hover:bg-green-700 px-4 py-2 rounded-full text-center">
+                        <i class="fas fa-user-plus mr-2"></i>Register
+                    </a>
+                </div>
             <?php endif; ?>
         </div>
     </div>

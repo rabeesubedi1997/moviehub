@@ -1,5 +1,5 @@
 <?php
-session_start();
+//session_start();
 require_once __DIR__ . '/../../../config/database.php';
 
 // Check if user is logged in and is admin
@@ -45,32 +45,45 @@ try {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
+<?php require __DIR__ . '/../layouts/header.php'; ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - MovieHub</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<!-- Add this after the header section -->
-<?php if (isset($_SESSION['success'])): ?>
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 mx-8" role="alert">
-        <span class="block sm:inline"><?php echo $_SESSION['success']; ?></span>
-    </div>
-    <?php unset($_SESSION['success']); ?>
-<?php endif; ?>
+<div class="container mx-auto px-4 py-8">
+    <!-- Success Message -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline"><?php echo $_SESSION['success']; ?></span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <svg onclick="this.parentElement.parentElement.remove()" 
+                     class="fill-current h-6 w-6 text-green-500 cursor-pointer" 
+                     role="button" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 20 20">
+                    <title>Close</title>
+                    <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                </svg>
+            </span>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
 
-<?php if (isset($_SESSION['error'])): ?>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 mx-8" role="alert">
-        <span class="block sm:inline"><?php echo $_SESSION['error']; ?></span>
-    </div>
-    <?php unset($_SESSION['error']); ?>
-<?php endif; ?>
+    <!-- Error Message -->
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline"><?php echo $_SESSION['error']; ?></span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <svg onclick="this.parentElement.parentElement.remove()" 
+                     class="fill-current h-6 w-6 text-red-500 cursor-pointer" 
+                     role="button" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 20 20">
+                    <title>Close</title>
+                    <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                </svg>
+            </span>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
-<body class="bg-gray-100">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
         <div class="bg-blue-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out">
@@ -79,20 +92,17 @@ try {
             </div>
 
             <nav class="text-white space-y-2 px-4">
-                <a href="dashboard.php" class="block py-2.5 px-4 rounded transition duration-200 bg-blue-700 hover:bg-blue-600">
+                <a href="/MovieHub/movie-website/public/admin/dashboard" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
                     Dashboard
                 </a>
-                <a href="add_movie.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                <a href="/MovieHub/movie-website/public/admin/add-movie" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
                     Add Movie
                 </a>
-                <a href="add_news.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                <a href="/MovieHub/movie-website/public/admin/add-news" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
                     Add News
                 </a>
-                <a href="manage_news.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                <a href="/MovieHub/movie-website/public/admin/manage-news" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
                     Manage News
-                </a>
-                <a href="/MovieHub/movie-website/app/Views/users/logout.php" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
-                    Logout
                 </a>
             </nav>
         </div>
@@ -104,16 +114,13 @@ try {
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                     <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
                     <div class="flex items-center space-x-4">
-                        <button onclick="window.location.href='add_movie.php'"
-                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        <a href="/MovieHub/movie-website/public/admin/add-movie" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             <i class="fas fa-plus mr-2"></i>Add Movie
-                        </button>
-                        <a href="/MovieHub/movie-website/public/index.php" target="_blank"
-                            class="text-blue-600 hover:text-blue-800">
+                        </a>
+                        <a href="/MovieHub/movie-website/public/" target="_blank" class="text-blue-600 hover:text-blue-800">
                             <i class="fas fa-external-link-alt mr-2"></i>View Site
                         </a>
-                        <a href="/MovieHub/movie-website/app/Views/users/logout.php"
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <a href="/MovieHub/movie-website/public/logout" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             <i class="fas fa-sign-out-alt mr-2"></i>Logout
                         </a>
                     </div>
@@ -190,7 +197,7 @@ try {
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <?php foreach ($recentMovies as $movie): ?>
                                         <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                 <?php echo htmlspecialchars($movie['title']); ?>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -200,14 +207,18 @@ try {
                                                 <?php echo htmlspecialchars($movie['release_date']); ?>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <button onclick="window.location.href='edit_movie.php?id=<?php echo $movie['id']; ?>'"
+                                                <a href="/MovieHub/movie-website/app/Views/admin/edit_movie.php?id=<?php echo $movie['id']; ?>"
                                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
                                                     <i class="fas fa-edit mr-1"></i>Edit
-                                                </button>
-                                                <button onclick="if(confirm('Are you sure you want to delete this movie?')) window.location.href='delete_movie.php?id=<?php echo $movie['id']; ?>'"
-                                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">
-                                                    <i class="fas fa-trash-alt mr-1"></i>Delete
-                                                </button>
+                                                </a>
+                                                <form action="/MovieHub/movie-website/public/api/movies/delete" method="POST" class="inline-block">
+                                                    <input type="hidden" name="id" value="<?php echo $movie['id']; ?>">
+                                                    <button type="submit"
+                                                        onclick="return confirm('Are you sure you want to delete this movie?')"
+                                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">
+                                                        <i class="fas fa-trash-alt mr-1"></i>Delete
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -226,6 +237,4 @@ try {
             </main>
         </div>
     </div>
-</body>
-
-</html>
+</div>

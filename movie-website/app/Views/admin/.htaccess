@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /MovieHub/movie-website/app/Views/admin/
+    
+    # Allow direct access to PHP files
+    <FilesMatch "\.php$">
+        Order Allow,Deny
+        Allow from all
+    </FilesMatch>
+</IfModule>

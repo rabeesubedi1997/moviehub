@@ -3,38 +3,53 @@ session_start();
 require_once __DIR__ . '/../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $email = $_POST['email'];
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    if ($password !== $confirm_password) {
-        $_SESSION['error'] = "Passwords do not match";
-        header('Location: /MovieHub/movie-website/app/Views/users/register.php');
-        exit();
-    }
-
     try {
+        // Validate input
+        if (empty($username) || empty($email) || empty($password)) {
+            throw new Exception("All fields are required");
+        }
+
+        if ($password !== $confirm_password) {
+            throw new Exception("Passwords do not match");
+        }
+
+        if (strlen($password) < 6) {
+            throw new Exception("Password must be at least 6 characters long");
+        }
+
         // Check if username already exists
         $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->execute([$username]);
-        if ($stmt->fetch()) {
-            $_SESSION['error'] = "Username already exists";
-            header('Location: /MovieHub/movie-website/app/Views/users/register.php');
-            exit();
+        if ($stmt->rowCount() > 0) {
+            throw new Exception("Username already exists");
         }
 
-        // Insert new user
+        // Check if email already exists
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->rowCount() > 0) {
+            throw new Exception("Email already exists");
+        }
+
+        // Hash password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert new user
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'user')");
         $stmt->execute([$username, $email, $hashed_password]);
 
         $_SESSION['success'] = "Registration successful! Please login.";
-        header('Location: /MovieHub/movie-website/app/Views/users/login.php');
+        header('Location: /MovieHub/movie-website/public/login');
         exit();
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Registration failed: " . $e->getMessage();
-        header('Location: /MovieHub/movie-website/app/Views/users/register.php');
+
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+        header('Location: /MovieHub/movie-website/public/register');
         exit();
     }
 }

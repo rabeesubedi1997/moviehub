@@ -1,17 +1,6 @@
 RewriteEngine On
-RewriteBase /MovieHub/movie-website/public/
+RewriteBase /MovieHub/movie-website/
 
-# Redirect news routes
-RewriteRule ^news/?$ index.php?action=news_list [L,QSA]
-RewriteRule ^news/([0-9]+)/?$ index.php?action=news_detail&id=$1 [L,QSA]
-
-# Handle other routes
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
-
-Options -Indexes
-<FilesMatch "\.(jpg|jpeg|png|gif)$">
-    Order Allow,Deny
-    Allow from all
-</FilesMatch>
+# Redirect to public folder
+RewriteCond %{REQUEST_URI} !^/MovieHub/movie-website/public/
+RewriteRule ^(.*)$ public/$1 [L]

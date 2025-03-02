@@ -1,4 +1,4 @@
-    <footer class="bg-gray-900 text-white py-12">
+<footer class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
@@ -27,6 +27,7 @@
             </div>
         </div>
     </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </body>
 
     </html>

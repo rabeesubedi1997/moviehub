@@ -48,20 +48,83 @@ class MovieController
 
     public function edit($id)
     {
-        $movie = $this->getMovieById($id);
-        require '../Views/admin/edit_movie.php';
+        try {
+            $movie = $this->getMovieById($id);
+            if (!$movie) {
+                throw new Exception("Movie not found");
+            }
+            return $movie;
+        } catch (Exception $e) {
+            throw new Exception("Error fetching movie: " . $e->getMessage());
+        }
     }
 
-    public function update($id, $data)
+    public function update($id, $data, $file = null)
     {
-        $this->updateMovie($id, $data);
-        header('Location: /movies');
+        try {
+            $updateData = [
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'release_date' => $data['release_date'],
+                'genre' => $data['genre'],
+                'director' => $data['director'],
+                'is_featured' => isset($data['is_featured']) ? 1 : 0,
+                'in_slider' => isset($data['in_slider']) ? 1 : 0
+            ];
+
+            // Handle new image upload if provided
+            if ($file && $file['size'] > 0) {
+                $image_filename = $this->handleImageUpload($file);
+                $updateData['image'] = $image_filename;
+
+                // Delete old image
+                $oldMovie = $this->getMovieById($id);
+                if ($oldMovie && $oldMovie['image']) {
+                    $oldImagePath = PUBLIC_PATH . '/assets/images/movies/' . $oldMovie['image'];
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
+                }
+            }
+
+            $columns = array_keys($updateData);
+            $placeholders = array_map(function ($col) {
+                return "$col = ?";
+            }, $columns);
+            $sql = "UPDATE movies SET " . implode(', ', $placeholders) . " WHERE id = ?";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([...array_values($updateData), $id]);
+
+            return true;
+        } catch (Exception $e) {
+            throw new Exception("Error updating movie: " . $e->getMessage());
+        }
     }
 
     public function delete($id)
     {
-        $this->deleteMovie($id);
-        header('Location: /movies');
+        try {
+            // First get the movie to delete its image
+            $stmt = $this->pdo->prepare("SELECT image FROM movies WHERE id = ?");
+            $stmt->execute([$id]);
+            $movie = $stmt->fetch();
+
+            if ($movie && $movie['image']) {
+                $imagePath = PUBLIC_PATH . '/assets/images/movies/' . $movie['image'];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+
+            // Delete the movie record
+            $stmt = $this->pdo->prepare("DELETE FROM movies WHERE id = ?");
+            $stmt->execute([$id]);
+
+            return true;
+        } catch (PDOException $e) {
+            throw new Exception("Error deleting movie: " . $e->getMessage());
+        }
     }
 
     public function getAllMovies()
